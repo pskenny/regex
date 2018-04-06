@@ -6,7 +6,7 @@ Project done for Graph Theory, Software Development Year 3, GMIT.
 
 Run the command-line
 
-```
+```shell
 > go get github.com/pskenny/regex
 ```
 
@@ -16,15 +16,15 @@ Now the library can be used in code
 package main
 
 import (
-	"fmt"
+    "fmt"
 
-	paulsregex "github.com/pskenny/regex"
+    paulsregex "github.com/pskenny/regex"
 )
 
 func main() {
-	// Test infix to postfix
-	fmt.Println(paulsregex.InfixIntoPostfix("a.b.c*"))
-	fmt.Println(paulsregex.InfixIntoPostfix("(a.(b|d))*"))
+    // Test infix to postfix
+    fmt.Println(paulsregex.InfixIntoPostfix("a.b.c*"))
+    fmt.Println(paulsregex.InfixIntoPostfix("(a.(b|d))*"))
 }
 
 ```
