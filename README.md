@@ -5,6 +5,7 @@ Project done for Graph Theory, Software Development Year 3, GMIT.
 ## Example Use
 
 Run the command-line
+
 ```
 > go get github.com/pskenny/regex
 ```
