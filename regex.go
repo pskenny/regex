@@ -23,7 +23,7 @@ func addState(states []*state, check *state, accept *state) []*state {
 // Match takes pattern string, text to evaluate, returns in pattern matches in text
 func Match(pattern string, text string) bool {
 	match := false
-	patternNfa := postfixRegexToNfa(InfixIntoPostfix(pattern))
+	patternNfa := postfixRegexToNfa(infixIntoPostfix(pattern))
 
 	currentStates := []*state{}
 	nextStates := []*state{}
@@ -131,9 +131,9 @@ func postfixRegexToNfa(postfix string) *nfaFragment {
 	return nfaStack[0]
 }
 
-// InfixIntoPostfix takes string with infix notation and returns string with postfix notation.
+// infixIntoPostfix takes string with infix notation and returns string with postfix notation.
 // Shunting-yard algorithm implementation in video "Shunting yard algorithm in Go" by Ian McLoughlin
-func InfixIntoPostfix(infix string) string {
+func infixIntoPostfix(infix string) string {
 	// Map with runes and associated weighting
 	specials := map[rune]int{'*': 10, '.': 9, '|': 8}
 	postfix, stack := []rune{}, []rune{}
