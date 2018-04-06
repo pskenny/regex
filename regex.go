@@ -1,5 +1,61 @@
 package regex
 
+// Regular expression match and addState functions from course material video "Regex match function"
+
+// Recursively traverse states
+func addState(states []*state, check *state, accept *state) []*state {
+	// Add state to array
+	states = append(states, check)
+
+	// Check if it has an empty string pass through (symbol == 0, not in accept)
+	if check != accept && check.symbol == 0 {
+		// Follow first edge
+		states = addState(states, check.edge1, accept)
+		// Follow second edge if present
+		if check.edge2 != nil {
+			states = addState(states, check.edge2, accept)
+		}
+	}
+
+	return states
+}
+
+// Match takes pattern string, text to evaluate, returns in pattern matches in text
+func Match(pattern string, text string) bool {
+	match := false
+	patternNfa := postfixRegexToNfa(InfixIntoPostfix(pattern))
+
+	currentStates := []*state{}
+	nextStates := []*state{}
+
+	// Find the initial (current) state(s)
+	currentStates = addState(currentStates[:], patternNfa.initial, patternNfa.accept)
+
+	// Go through each character in text
+	for _, r := range text {
+		// Check all current states if rune matches symbol (appropriate for next)
+		for _, current := range currentStates {
+			// Set up next states
+			if current.symbol == r {
+				nextStates = addState(nextStates[:], current.edge1, patternNfa.accept)
+			}
+		}
+		// Swap current and next states, reset next
+		currentStates, nextStates = nextStates, []*state{}
+	}
+
+	for _, current := range currentStates {
+		// Check if any current states are in an accept state
+		// Set match to true and break from loop
+		if current == patternNfa.accept {
+			match = true
+			break
+		}
+	}
+
+	return match
+}
+
 // Implementation of Thompsons Construction from course material video "go-thompson-final"
 
 type state struct {
@@ -15,8 +71,8 @@ type nfaFragment struct {
 	accept  *state
 }
 
-// pfxRegexToNfa takes postfix regular expression string and returns an NFA
-func pfxRegexToNfa(postfix string) *nfaFragment {
+// postfixRegexToNfa takes postfix regular expression string and returns an NFA
+func postfixRegexToNfa(postfix string) *nfaFragment {
 	nfaStack := []*nfaFragment{}
 
 	// Loop through expression one rune (r) at a time
