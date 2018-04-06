@@ -1,5 +1,80 @@
 package regex
 
+// Implementation of Thompsons Construction from course material video "go-thompson-final"
+
+type state struct {
+	symbol rune
+	// Edges equivalent to arrows diagramatically
+	edge1 *state
+	edge2 *state
+}
+
+// NFA fragments connects states together
+type nfaFragment struct {
+	initial *state
+	accept  *state
+}
+
+// pfxRegexToNfa takes postfix regular expression string and returns an NFA
+func pfxRegexToNfa(postfix string) *nfaFragment {
+	nfaStack := []*nfaFragment{}
+
+	// Loop through expression one rune (r) at a time
+	for _, r := range postfix {
+		switch r {
+		// Concatenate
+		case '.':
+			// "Pop" off the NFA stack (get fragment and slice stack)
+			fragment2 := nfaStack[len(nfaStack)-1]
+			nfaStack = nfaStack[:len(nfaStack)-1]
+			fragment1 := nfaStack[len(nfaStack)-1]
+			nfaStack = nfaStack[:len(nfaStack)-1]
+			// Join fragments (change pointer in struct)
+			fragment1.accept.edge1 = fragment2.initial
+			// "Push" joined fragments to NFA stack
+			nfaStack = append(nfaStack, &nfaFragment{initial: fragment1.initial, accept: fragment2.accept})
+		// Or
+		case '|':
+			// "Pop" off the NFA stack (get fragment and slice stack)
+			fragment2 := nfaStack[len(nfaStack)-1]
+			nfaStack = nfaStack[:len(nfaStack)-1]
+			fragment1 := nfaStack[len(nfaStack)-1]
+			nfaStack = nfaStack[:len(nfaStack)-1]
+			// See course material slides.pdf ("Thompson’s construction"), slide 6, for diagramic view of following
+			// New initial state
+			initial := state{edge1: fragment1.initial, edge2: fragment2.initial}
+			accept := state{}
+			// Join accept states
+			fragment1.accept.edge1 = &accept
+			fragment2.accept.edge1 = &accept
+			// "Push" new fragment to NFA stack
+			nfaStack = append(nfaStack, &nfaFragment{initial: &initial, accept: &accept})
+		// Kleene star
+		case '*':
+			// "Pop" off the NFA stack (get fragment and slice stack)
+			fragment := nfaStack[len(nfaStack)-1]
+			nfaStack = nfaStack[:len(nfaStack)-1]
+			// See course material slides.pdf ("Thompson’s construction"), slide 7, for diagramic view of following
+			accept := state{}
+			initial := state{edge1: fragment.initial, edge2: &accept}
+			fragment.accept.edge1 = fragment.initial
+			fragment.accept.edge2 = &accept
+			// "Push" new fragment to NFA stack
+			nfaStack = append(nfaStack, &nfaFragment{initial: &initial, accept: &accept})
+		// Not a special character
+		default:
+			// "Push" to the stack
+			accept := state{}
+			// New state with symbol value of rune
+			initial := state{symbol: r, edge1: &accept}
+			// "Push" to stack
+			nfaStack = append(nfaStack, &nfaFragment{initial: &initial, accept: &accept})
+		}
+	}
+
+	return nfaStack[0]
+}
+
 // InfixIntoPostfix takes string with infix notation and returns string with postfix notation.
 // Shunting-yard algorithm implementation in video "Shunting yard algorithm in Go" by Ian McLoughlin
 func InfixIntoPostfix(infix string) string {
