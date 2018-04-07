@@ -1,5 +1,44 @@
 package regex
 
+// Compile takes pattern string and returns NFA
+func Compile(pattern string) *NfaFragment {
+	return postfixRegexToNfa(infixIntoPostfix(pattern))
+}
+
+// Match takes string to check pattern against
+func (nfa *NfaFragment) Match(text string) bool {
+	match := false
+	currentStates := []*state{}
+	nextStates := []*state{}
+
+	// Find the initial (current) state(s)
+	currentStates = addState(currentStates[:], nfa.initial, nfa.accept)
+
+	// Go through each character in text
+	for _, r := range text {
+		// Check all current states if rune matches symbol (appropriate for next)
+		for _, current := range currentStates {
+			// Set up next states
+			if current.symbol == r {
+				nextStates = addState(nextStates[:], current.edge1, nfa.accept)
+			}
+		}
+		// Swap current and next states, reset next
+		currentStates, nextStates = nextStates, []*state{}
+	}
+
+	for _, current := range currentStates {
+		// Check if any current states are in an accept state
+		// Set match to true and break from loop
+		if current == nfa.accept {
+			match = true
+			break
+		}
+	}
+
+	return match
+}
+
 // Regular expression match and addState functions from course material video "Regex match function"
 
 // Recursively traverse states
@@ -65,15 +104,15 @@ type state struct {
 	edge2 *state
 }
 
-// NFA fragments connects states together
-type nfaFragment struct {
+// NfaFragment connects states together
+type NfaFragment struct {
 	initial *state
 	accept  *state
 }
 
 // postfixRegexToNfa takes postfix regular expression string and returns an NFA
-func postfixRegexToNfa(postfix string) *nfaFragment {
-	nfaStack := []*nfaFragment{}
+func postfixRegexToNfa(postfix string) *NfaFragment {
+	nfaStack := []*NfaFragment{}
 
 	// Loop through expression one rune (r) at a time
 	for _, r := range postfix {
@@ -88,7 +127,7 @@ func postfixRegexToNfa(postfix string) *nfaFragment {
 			// Join fragments (change pointer in struct)
 			fragment1.accept.edge1 = fragment2.initial
 			// "Push" joined fragments to NFA stack
-			nfaStack = append(nfaStack, &nfaFragment{initial: fragment1.initial, accept: fragment2.accept})
+			nfaStack = append(nfaStack, &NfaFragment{initial: fragment1.initial, accept: fragment2.accept})
 		// Or
 		case '|':
 			// "Pop" off the NFA stack (get fragment and slice stack)
@@ -104,7 +143,7 @@ func postfixRegexToNfa(postfix string) *nfaFragment {
 			fragment1.accept.edge1 = &accept
 			fragment2.accept.edge1 = &accept
 			// "Push" new fragment to NFA stack
-			nfaStack = append(nfaStack, &nfaFragment{initial: &initial, accept: &accept})
+			nfaStack = append(nfaStack, &NfaFragment{initial: &initial, accept: &accept})
 		// Kleene star
 		case '*':
 			// "Pop" off the NFA stack (get fragment and slice stack)
@@ -116,7 +155,7 @@ func postfixRegexToNfa(postfix string) *nfaFragment {
 			fragment.accept.edge1 = fragment.initial
 			fragment.accept.edge2 = &accept
 			// "Push" new fragment to NFA stack
-			nfaStack = append(nfaStack, &nfaFragment{initial: &initial, accept: &accept})
+			nfaStack = append(nfaStack, &NfaFragment{initial: &initial, accept: &accept})
 		// Not a special character
 		default:
 			// "Push" to the stack
@@ -124,7 +163,7 @@ func postfixRegexToNfa(postfix string) *nfaFragment {
 			// New state with symbol value of rune
 			initial := state{symbol: r, edge1: &accept}
 			// "Push" to stack
-			nfaStack = append(nfaStack, &nfaFragment{initial: &initial, accept: &accept})
+			nfaStack = append(nfaStack, &NfaFragment{initial: &initial, accept: &accept})
 		}
 	}
 
