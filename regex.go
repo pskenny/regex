@@ -1,5 +1,21 @@
 package regex
 
+// Course material videos "Regex match function", "go-thompson-final", "Shunting yard algorithm in Go" by Ian
+// McLoughlin used for implementations of Thompsons Construction, Shunting-yard algorithm and functions.
+
+type state struct {
+	symbol rune
+	// Edges equivalent to arrows diagramatically
+	edge1 *state
+	edge2 *state
+}
+
+// NfaFragment connects states together
+type NfaFragment struct {
+	initial *state
+	accept  *state
+}
+
 // Compile takes pattern string and returns NFA
 func Compile(pattern string) *NfaFragment {
 	return postfixRegexToNfa(infixIntoPostfix(pattern))
@@ -39,26 +55,6 @@ func (nfa *NfaFragment) Match(text string) bool {
 	return match
 }
 
-// Regular expression match and addState functions from course material video "Regex match function"
-
-// Recursively traverse states
-func addState(states []*state, check *state, accept *state) []*state {
-	// Add state to array
-	states = append(states, check)
-
-	// Check if it has an empty string pass through (symbol == 0, not in accept)
-	if check != accept && check.symbol == 0 {
-		// Follow first edge
-		states = addState(states, check.edge1, accept)
-		// Follow second edge if present
-		if check.edge2 != nil {
-			states = addState(states, check.edge2, accept)
-		}
-	}
-
-	return states
-}
-
 // Match takes pattern string, text to evaluate, returns in pattern matches in text
 func Match(pattern string, text string) bool {
 	match := false
@@ -95,19 +91,22 @@ func Match(pattern string, text string) bool {
 	return match
 }
 
-// Implementation of Thompsons Construction from course material video "go-thompson-final"
+// Recursively traverse states
+func addState(states []*state, check *state, accept *state) []*state {
+	// Add state to array
+	states = append(states, check)
 
-type state struct {
-	symbol rune
-	// Edges equivalent to arrows diagramatically
-	edge1 *state
-	edge2 *state
-}
+	// Check if it has an empty string pass through (symbol == 0, not in accept)
+	if check != accept && check.symbol == 0 {
+		// Follow first edge
+		states = addState(states, check.edge1, accept)
+		// Follow second edge if present
+		if check.edge2 != nil {
+			states = addState(states, check.edge2, accept)
+		}
+	}
 
-// NfaFragment connects states together
-type NfaFragment struct {
-	initial *state
-	accept  *state
+	return states
 }
 
 // postfixRegexToNfa takes postfix regular expression string and returns an NFA
@@ -171,7 +170,6 @@ func postfixRegexToNfa(postfix string) *NfaFragment {
 }
 
 // infixIntoPostfix takes string with infix notation and returns string with postfix notation.
-// Shunting-yard algorithm implementation in video "Shunting yard algorithm in Go" by Ian McLoughlin
 func infixIntoPostfix(infix string) string {
 	// Map with runes and associated weighting
 	specials := map[rune]int{'*': 10, '.': 9, '|': 8}
