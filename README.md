@@ -53,6 +53,7 @@ It is composed of three main parts:
 
 ## References
 
+- Course material by [Ian McLoughlin](https://github.com/ianmcloughlin)
 - [Official Go Documentation](https://golang.org/doc/)
 - [Stack Overflow](https://stackoverflow.com/questions/3639574/writing-a-parser-for-regular-expressions)
 - [Regular Expression Matching Can Be Simple And Fast](https://swtch.com/~rsc/regexp/regexp1.html)
