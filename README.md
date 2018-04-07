@@ -24,14 +24,21 @@ package main
 import (
     "fmt"
 
-    paulsregex "github.com/pskenny/regex"
+    rgx "github.com/pskenny/regex"
 )
 
 func main() {
-    // Test matching
-    fmt.Println(paulsregex.Match("a.b*", "abbb"))       // true
-    fmt.Println(paulsregex.Match("a.b*.c", "abbbbbbc")) // true
-    fmt.Println(paulsregex.Match("a.b.c", "cba"))       // false
+    nfa := rgx.Compile("1.0*.1") // starts with 1, zero or more 0's and ending in 1
+    t := nfa.Match("10001")      // true
+    f := nfa.Match("01110")      // false
+
+    fmt.Println(t)
+    fmt.Println(f)
+
+    // Single liner
+    s := rgx.Match("1.0*.1", "10001")
+
+    fmt.Println(s)
 }
 
 ```
