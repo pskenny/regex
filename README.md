@@ -28,7 +28,10 @@ import (
 )
 
 func main() {
-    fmt.Println(paulsregex.Match("a.b*", "abbb"))
+    // Test matching
+    fmt.Println(paulsregex.Match("a.b*", "abbb"))       // true
+    fmt.Println(paulsregex.Match("a.b*.c", "abbbbbbc")) // true
+    fmt.Println(paulsregex.Match("a.b.c", "cba"))       // false
 }
 
 ```
