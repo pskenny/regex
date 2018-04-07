@@ -1,7 +1,7 @@
 package regex
 
 // Course material videos "Regex match function", "go-thompson-final", "Shunting yard algorithm in Go" by Ian
-// McLoughlin used for implementations of Thompsons Construction, Shunting-yard algorithm and functions.
+// McLoughlin used for implementations of Thompson's construction, Shunting-yard algorithm and functions.
 
 type state struct {
 	symbol rune
