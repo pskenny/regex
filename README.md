@@ -48,7 +48,7 @@ func main() {
 It is composed of three main parts:
 
 - Infix to postfix expression parser using the [Shunting-yard algorithm](https://en.wikipedia.org/wiki/Shunting-yard_algorithm)
-- Thompson Construction turns a postfix regular expression into a Non-deterministic Finite Automata (NFA)
+- [Thompson's construction](https://en.wikipedia.org/wiki/Thompson%27s_construction) turns a postfix regular expression into a Non-deterministic Finite Automata (NFA)
 - An exported match function traverses the NFA over a given input string and returns a true or false value (match or no match)
 
 ## References
