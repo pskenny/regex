@@ -22,23 +22,22 @@ Now the library can be used in code, as in the following example:
 package main
 
 import (
-    "fmt"
+	"fmt"
 
-    rgx "github.com/pskenny/regex"
+	rgx "github.com/pskenny/regex"
 )
 
 func main() {
-    nfa := rgx.Compile("1.0*.1") // starts with 1, zero or more 0's and ending in 1
-    t := nfa.Match("10001")      // true
-    f := nfa.Match("01110")      // false
+	nfa := rgx.Compile("1.0*.1") // Pattern means starting with a "1", followed by one or more "0"s and ending in a "1"
+	t := nfa.Match("10001")      // true
+	f := nfa.Match("01110")      // false
 
-    fmt.Println(t)
-    fmt.Println(f)
+	fmt.Printf("Pattern \"1.0*.1\" on 10001 is %t\n", t)
+	fmt.Printf("Pattern \"1.0*.1\" on 01110 is %t\n", f)
 
-    // Single liner
-    s := rgx.Match("1.0*.1", "10001")
-
-    fmt.Println(s)
+	// On a single line
+	s := rgx.Match("1.0*.1", "10001")
+	fmt.Printf("Pattern \"1.0*.1\" on 10001 is %t\n", s)
 }
 
 ```
